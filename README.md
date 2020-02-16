@@ -1,10 +1,9 @@
-# [[YouTube]](https://github.com/hanyoseob/pytorch-mnist) CNN을 이용한 MNIST clssifier 만들기
+# [ONE TAKE] 001 - MNIST
 
-### YouTue
-[[ONE TAKE] 001 - MNIST](https://youtu.be/7qMslXBGjfM)
+### Link
+[YouTue](https://youtu.be/7qMslXBGjfM)
 
-### Github
-[youtube-pyroth-mnist](https://github.com/hanyoseob/youtube-pyroth-mnist)
+[Github](https://github.com/hanyoseob/youtube-pyroth-mnist)
 
 ### Network architecture
 ![alt text](./img/network.png "Network architecture")
