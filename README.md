@@ -1,9 +1,9 @@
-# [ONE TAKE] 001 - MNIST
+# [CNN Implementation] 001 - MNIST
 
 ### Link
 [YouTue](https://youtu.be/7qMslXBGjfM)
 
-[Github](https://github.com/hanyoseob/youtube-pyroth-mnist)
+[Github](https://github.com/hanyoseob/youtube-001-pytorch-mnist)
 
 ### Network architecture
 ![alt text](./img/network.png "Network architecture")
