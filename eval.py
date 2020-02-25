@@ -1,7 +1,6 @@
 ## 라이브러리를 추가하기
 import os
 import numpy as np
-
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
