@@ -1,8 +1,6 @@
 # [CNN Implementation] 001 - MNIST
 
 ### Link
-[YouTue](https://youtu.be/7qMslXBGjfM)
-
 [Github](https://github.com/hanyoseob/youtube-001-pytorch-mnist)
 
 ### Network architecture
