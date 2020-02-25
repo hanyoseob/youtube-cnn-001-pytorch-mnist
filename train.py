@@ -90,7 +90,7 @@ num_data = len(loader.dataset)
 num_batch = round(num_data / batch_size)
 
 ## 네트워크를 생성하기
-net = Net()
+net = Net().to(device)
 params = net.parameters()
 
 ## 손실함수 등을 설정하기
