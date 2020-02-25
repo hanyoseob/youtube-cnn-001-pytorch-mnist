@@ -1,6 +1,7 @@
-## 라이브러리를 추가하기
+## 라이브러리 추가하기
 import os
 import numpy as np
+
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
@@ -8,13 +9,13 @@ from torch.utils.tensorboard import SummaryWriter
 
 from torchvision import transforms, datasets
 
-## 트레이닝 파라메터를 설정하기
+## 트레이닝 필요한 파라메터를 설정하기
 lr = 1e-3
 batch_size = 64
 num_epoch = 10
 
-ckpt_dir = './checkpoint/'
-log_dir = './log/'
+ckpt_dir = './checkpoint'
+log_dir = './log'
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -22,6 +23,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
+
         self.conv1 = nn.Conv2d(in_channels=1, out_channels=10, kernel_size=5, stride=1, padding=0, bias=True)
         self.pool1 = nn.MaxPool2d(kernel_size=2)
         self.relu1 = nn.ReLU()
@@ -65,8 +67,6 @@ def save(ckpt_dir, net, optim, epoch):
     torch.save({'net': net.state_dict(), 'optim': optim.state_dict()},
                './%s/model_epoch%d.pth' % (ckpt_dir, epoch))
 
-    print('model_epoch%d.pth is saved.' % epoch)
-
 def load(ckpt_dir, net, optim):
     ckpt_lst = os.listdir(ckpt_dir)
     ckpt_lst.sort()
@@ -76,79 +76,51 @@ def load(ckpt_dir, net, optim):
     net.load_state_dict(dict_model['net'])
     optim.load_state_dict(dict_model['optim'])
 
-    print('%s is loaded.' % ckpt_lst[-1])
-
     return net, optim
 
-## 학습 시킬 데이터를 불러오기
+## MNIST 데이터 불러오기
 transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize(mean=(0.5,), std=(0.5,))])
 
-dataset = datasets.MNIST(root='./', train=False, download=True, transform=transform)
+dataset = datasets.MNIST(download=True, root='./', train=False, transform=transform)
 loader = DataLoader(dataset, batch_size=batch_size, shuffle=False, num_workers=0)
 
 num_data = len(loader.dataset)
-num_batch = round(num_data / batch_size)
+num_batch = np.ceil(num_data / batch_size)
 
-## 네트워크를 생성하기
+## 네트워크 설정 및 필요한 손실함수 구현하기
 net = Net().to(device)
 params = net.parameters()
 
-## 손실함수 등을 설정하기
 fn_loss = nn.CrossEntropyLoss().to(device)
 fn_pred = lambda output: torch.softmax(output, dim=1)
 fn_acc = lambda pred, label: ((pred.max(dim=1)[1] == label).type(torch.float)).mean()
 
-optim = torch.optim.Adam(params=params, lr=lr)
+optim = torch.optim.Adam(params, lr=lr)
 
 writer = SummaryWriter(log_dir=log_dir)
 
-## 네트워크를 불러오기
 net, optim = load(ckpt_dir=ckpt_dir, net=net, optim=optim)
 
-## 테스트를 시작하기
-# for epoch in range(1, num_epoch + 1):
-    # net.train()
+## 트레이닝 시작하기
 with torch.no_grad():
+    # net.train()
     net.eval()
 
     loss_arr = []
     acc_arr = []
 
     for batch, (input, label) in enumerate(loader, 1):
-        # forward propagation 하기
         input = input.to(device)
         label = label.to(device)
 
         output = net(input)
         pred = fn_pred(output)
 
-        # backward propagation
-        # optim.zero_grad()
-
         loss = fn_loss(output, label)
-        # loss.backward()
-
         acc = fn_acc(pred, label)
 
-        # optim.step()
-
-        # 손실함수를 계산하기
         loss_arr += [loss.item()]
         acc_arr += [acc.item()]
 
-        # print('TRAIN: EPOCH %d/%d | BATCH %04d/%04d | LOSS: %.4f | ACC: %.4f' %
-        #       (epoch, num_epoch, batch, num_batch, np.mean(loss_arr), np.mean(acc_arr)))
-
-        print('EVAL: BATCH %04d/%04d | LOSS: %.4f | ACC: %.4f' %
+        print('TEST: BATCH %04d/%04d | LOSS: %.4f | ACC %.4f' %
               (batch, num_batch, np.mean(loss_arr), np.mean(acc_arr)))
-
-    print('FINAL EVAL: LOSS: %.4f | ACC: %.4f' % (np.mean(loss_arr), np.mean(acc_arr)))
-
-    # write log
-    # writer.add_scalar('loss', np.mean(loss_arr), epoch)
-    # writer.add_scalar('acc', np.mean(acc_arr), epoch)
-
-    # Save network & optimizer
-    # save(ckpt_dir=ckpt_dir, net=net, optim=optim, epoch=epoch)
-
-# writer.close()
